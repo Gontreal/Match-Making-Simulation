@@ -1,7 +1,7 @@
 #include"charactors.h"
 #include<string>
 
-void woman::eval(const shared_ptr<Man>& a ){
+void woman::eval(const boost::shared_ptr<Man>& a ){
         int score_a=a->show_appearence()*expect_appearence+a->show_wealth()*expect_wealth+a->show_personality()*expect_personality;
         int score_b=loved_one->show_appearence()*expect_appearence+loved_one->show_wealth()*expect_wealth+loved_one->show_personality()*expect_personality;
         int alt_score_a=a->show_appearence()+a->show_wealth()+a->show_personality();
@@ -75,12 +75,12 @@ istream& operator >>(istream& is, Man& m){
     return is;
 }
 
-	shared_ptr<woman> Man::dream_girl()  {
+boost::shared_ptr<woman> Man::dream_girl()  {
         if(dream_girls.empty()){
             cerr<<"I need to know all the girls first"<<endl;
         }
 
-         shared_ptr<woman> a=dream_girls.top();
+		boost::shared_ptr<woman> a=dream_girls.top();
         while(!(a->is_avail())){
             if(dream_girls.empty()){
                 cerr<<"No one fucking wants you!!"<<endl;
@@ -110,7 +110,7 @@ istream& operator >>(istream& is, Man& m){
 
 
     //carefult it's a max_heap or min_heap
-    bool Man::comparetype::operator()(const shared_ptr<woman>& a,  const shared_ptr<woman>& b){
+    bool Man::comparetype::operator()(const boost::shared_ptr<woman>& a,  const boost::shared_ptr<woman>& b){
             int score_a=(a->show_personality()*expect_personality)+(a->show_appearence()*expect_appearence)+(a->show_wealth()*expect_wealth);
             int score_b=(b->show_personality()*expect_personality)+(b->show_appearence()*expect_appearence)+(b->show_wealth()*expect_wealth);
             int alt_score_a=a->show_appearence()+a->show_wealth()+a->show_personality();
@@ -144,7 +144,7 @@ istream& operator >>(istream& is, Man& m){
 
         }
 
-    void Man::build_heap(const unordered_map<int,shared_ptr<woman>>& women_pool){
+    void Man::build_heap(const unordered_map<int, boost::shared_ptr<woman>>& women_pool){
         for(auto w:women_pool)
                 dream_girls.push(w.second);
        // cout<<"No. "<<id<<" has met all girls."<<endl;

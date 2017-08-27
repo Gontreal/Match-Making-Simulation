@@ -1,13 +1,12 @@
 #ifndef PERSON_H
 #define PERSON_H
-#include<queue>
-#include<memory>
-#include<vector>
-#include<iostream>
-#include<unordered_map>
-#include<functional>
-#include<list>
-#include<boost/python.hpp>
+//#include<queue>
+//#include<memory>
+//#include<vector>
+//#include<iostream>
+//#include<unordered_map>
+//#include<functional>
+//#include<list>
 using namespace std;
 //consider it as a general "human" without regarding of sex
 class Person

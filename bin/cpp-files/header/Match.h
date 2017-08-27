@@ -2,7 +2,9 @@
 #define MATCH_H
 #include<unordered_map>
 #include <queue>
-#include <memory>
+//#include <memory>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -11,6 +13,7 @@
 #include<cstdlib>
 #include<stack>
 #include"charactors.h"
+using namespace boost;
 using namespace std;
 
 class Match
@@ -53,15 +56,16 @@ class Match
 
     private:
         //this is the recycle bin for men that are removed once find his match
-        stack<shared_ptr<Man>> missing_male_bin;
+        stack<boost::shared_ptr<Man>> missing_male_bin;
 
         //this is the data base of all the players.
-        unordered_map<int,shared_ptr<Man>> men_pool;
-        unordered_map<int,shared_ptr<woman>> women_pool;
+        unordered_map<int, boost::shared_ptr<Man>> men_pool;
+        unordered_map<int, boost::shared_ptr<woman>> women_pool;
 
-        shared_ptr<woman> queen=make_shared<woman>(woman());
+		boost::shared_ptr<woman> queen= boost::make_shared<woman>(woman());
+		//boost::shared_ptr<woman> queen(new woman());
         //the function that find the most popular lady
-        void find_queen(const shared_ptr<woman>& a);
+        void find_queen(const boost::shared_ptr<woman>& a);
         //add players into the pool
         void initializing(ifstream& men_list,ifstream& women_list);
         //Traverse men_pool to MAKE INVITATIONS

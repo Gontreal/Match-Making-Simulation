@@ -1,12 +1,15 @@
 #ifndef CHARACTORS_H
 #define CHARACTORS_H
 #include<queue>
-#include<memory>
+//#include<memory>
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include<vector>
 #include<iostream>
 #include<unordered_map>
 #include<functional>
 #include<list>
+using namespace boost;
 using namespace std;
 //consider it as a general "human" without regarding of sex
 class base
@@ -52,7 +55,7 @@ public:
     {}
 
     Man(int id,int appearence,int personality,int wealth,int e_appear,int e_personality,int e_wealth,
-         const unordered_map<int,shared_ptr<woman>>& women_pool)
+         const unordered_map<int,boost::shared_ptr<woman>>& women_pool)
         :base(id,appearence,personality,wealth,e_appear,e_personality,e_wealth),dream_girls(comparetype{this->expect_appearence,this->expect_personality,this->expect_wealth})
     {
         build_heap(women_pool);
@@ -60,19 +63,19 @@ public:
 
     Man();
     //for batch initializing the max heap
-    void meet_women(const unordered_map<int,shared_ptr<woman>>& girl) { build_heap(girl);}
+    void meet_women(const unordered_map<int, boost::shared_ptr<woman>>& girl) { build_heap(girl);}
     //for just add one new girl into the heap
-    void new_girl(const shared_ptr<woman>& girl)    {dream_girls.push(girl);}
+    void new_girl(const boost::shared_ptr<woman>& girl)    {dream_girls.push(girl);}
 
     ~Man() {}
     //return the max
-     shared_ptr<woman> dream_girl();
+	boost::shared_ptr<woman> dream_girl();
 private:
     // the custom compare method
     struct comparetype{
 
     //comparetype(int e_appearence,int e_personnality,int e_wealth);
-    bool operator () (const shared_ptr<woman>& a,  const shared_ptr<woman>& b);
+    bool operator () (const boost::shared_ptr<woman>& a,  const boost::shared_ptr<woman>& b);
         //return m->Mycompare(a,b);
 
     int expect_appearence;
@@ -83,7 +86,7 @@ private:
     // main max heap data structrue that return the most interested girl according the
     //the rating method of the spec.
     //PAY ATTENTION TO HOW YOU CONSTRUCT THE COMPARETYPE CLASS
-    priority_queue<shared_ptr<woman>,vector<shared_ptr<woman>>,comparetype>
+    priority_queue<boost::shared_ptr<woman>,vector<boost::shared_ptr<woman>>,comparetype>
     dream_girls;
     //the recycle bin for the restore process in match class to collect the dream girl
     //once it is removed from the heap.
@@ -92,11 +95,11 @@ private:
     //every time. So I defind it as linked list rather than stack for further update.
     //the main problem is when add a new female main characror, it main need some handling as to wether
     //add it into the heap or the already sorted list and remove it after the match.
-    list<shared_ptr<woman>> girl_bin;
+    list<boost::shared_ptr<woman>> girl_bin;
     // add the girls back
     void restore_dream_girls();
     //fucntion to build the dream girl heap
-    void build_heap(const unordered_map<int,shared_ptr<woman>>& girl);
+    void build_heap(const unordered_map<int, boost::shared_ptr<woman>>& girl);
 };
 
 
@@ -114,16 +117,16 @@ public:
 	~woman(){}
 	int check_popularity() const {return popularity;}
 	//evaluation of the male player who invite this girl according to the spec.
-	void meet(const shared_ptr<Man>& a) {eval(a);}
+	void meet(const boost::shared_ptr<Man>& a) {eval(a);}
 	//reset after each round
-	void reset( const shared_ptr<Man>& dummy)  {popularity=0;loved_one=dummy;}
+	void reset( const boost::shared_ptr<Man>& dummy)  {popularity=0;loved_one=dummy;}
 private:
     //number of male who invite this girl
     int popularity=0;
     //the one that match this girl's requirement best
-	shared_ptr<Man> loved_one;
+	boost::shared_ptr<Man> loved_one;
     //the process to select "the one"
-	void eval(const shared_ptr<Man>& a );
+	void eval(const boost::shared_ptr<Man>& a );
 
 };
 #endif // CHARACTORS_H
