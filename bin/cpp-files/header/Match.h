@@ -26,7 +26,7 @@ class Match
         //a debugging begin for no main charactor
         void debug_start(){
             int debug_count=1;
-            while(men_pool.size()|| women_pool.size()){
+            while(m_list.size()|| w_list.size()){
                 cout<<"Round "<<debug_count++<<" begins:"<<endl;
                 make_invitations();
                 matching_n_reset();
@@ -56,16 +56,20 @@ class Match
 
     private:
         //this is the recycle bin for men that are removed once find his match
-        stack<boost::shared_ptr<Man>> missing_male_bin;
+        stack<int> missing_male_bin;
 
         //this is the data base of all the players.
-        unordered_map<int, boost::shared_ptr<Man>> men_pool;
-        unordered_map<int, boost::shared_ptr<woman>> women_pool;
+        //unordered_map<int, boost::shared_ptr<Man>> men_pool;
+        //unordered_map<int, boost::shared_ptr<woman>> women_pool;
+		vector<FemalePlayer> w_list;
+		vector<MalePlayer> m_list;
+		FemalePlayer FemaleMain;
+		MalePlayer MaleMain;
 
-		boost::shared_ptr<woman> queen= boost::make_shared<woman>(woman());
+		FemalePlayer queen=FemalePlayer(woman());
 		//boost::shared_ptr<woman> queen(new woman());
         //the function that find the most popular lady
-        void find_queen(const boost::shared_ptr<woman>& a);
+        void find_queen(const FemalePlayer& a);
         //add players into the pool
         void initializing(ifstream& men_list,ifstream& women_list);
         //Traverse men_pool to MAKE INVITATIONS

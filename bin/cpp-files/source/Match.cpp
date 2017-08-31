@@ -1,6 +1,6 @@
 #include "Match.h"
 
-void Match::find_queen(const boost::shared_ptr<woman>& a){
+void Match::find_queen(const FemalePlayer& a){
     int pa=a->check_popularity();
     int pb=queen->check_popularity();
     int alt_a=a->show_appearence()+a->show_personality()+a->show_wealth();
@@ -16,78 +16,127 @@ void Match::find_queen(const boost::shared_ptr<woman>& a){
 }
 
 void Match::initializing(ifstream& men_list,ifstream& women_list){
-	boost::shared_ptr<Man> mdummy=make_shared<Man>(Man());
-
+	cout << "Initialization begin... " << endl;
+	MalePlayer mdummy=MalePlayer(Man());
+	if (mdummy->show_id() != 101)
+		cout << "WTF" << endl;
+	m_list.reserve(100);
+	w_list.reserve(100);
+	for (auto i = 0; i != 100; ++i) {
+		m_list.push_back(MalePlayer());
+		w_list.push_back(FemalePlayer());
+	}
+	cout << "Database initialization Completed" << endl;
     while(women_list){
         woman w;
         women_list>>w;
+		FemalePlayer fp(w);
         //cout<<w.appearence<<" "<<w.personality<<" "<<w.wealth<<endl;
         //cout<<w.loved_one->show_id()<<endl;
-        if(w.show_id()!=101){
-            w.loved_one=mdummy;
-            women_pool[w.show_id()]=make_shared<woman>(w);
-        }
+        if(fp->show_id()!=101){
+            fp->fell_love(mdummy);
+			//auto player = w.ready();
+            //[w.show_id()]=boost::make_shared<woman>(w);
+			w_list[fp->show_id()]=fp;
+			//cout << "Female Player No." << fp->show_id() << " loaded" << endl;
+		}
     }
-
+	//cout << "Female player Initialization complete. " << endl;
     while(men_list){
         Man m;
         men_list>>m;
+		MalePlayer mp(m);
         //cout<<m.appearence<<" "<<m.personality<<" "<<m.wealth<<endl;
         //cout<<"Male No. "<<m.show_id()<<" has met all the girls."<<endl;
-        if(m.show_id()!=101){
-            m.meet_women(women_pool);
+		//vector<FemalePlayer> w_list;
+		//w_list.reserve(women_pool.size());
+		//for (auto w : women_pool) {
+		//	w_list.push_back(FemalePlayer(w.second));
+		//}
+		
+        if(mp->show_id()!=101){
+			
+            mp->meet_women(w_list);
             //cout<<m.dream_girls.size()<<endl;
-            men_pool[m.show_id()]= boost::make_shared<Man>(m);
+			//auto player = m.ready();
+            //men_pool[m.show_id()]= boost::make_shared<Man>(m);
+			m_list[mp->show_id()]=mp;
         }
     }
-    //cout<<"Initialization complete. "<<men_pool.size()<<" "<<women_pool.size()<<endl;
+	cout << "Initialization checking. " << endl;
+	for (auto m = 0; m != m_list.size();++m) {
+		if (m_list[m]->show_id() != m) {
+			cout << "Initialization Failed" << endl;
+			break;
+		}
+	}
+	for (auto w = 0; w != w_list.size(); ++w) {
+		if (w_list[w]->show_id() != w) {
+			cout << "Initialization Failed" << endl;
+			break;
+		}
+	}
+    cout<<"Initialization complete. "<<endl;
 }
 
 void Match::make_invitations() {
-
-    for(auto a:men_pool ){
-		boost::shared_ptr<woman> w=(a.second)->dream_girl();
-        w->meet(a.second);
-        ++(w->popularity);
-        find_queen(w);
-
+	if (MaleMain.is_loaded()) {
+		
+		FemalePlayer w = MaleMain.dream_girl();
+		w.meet(MaleMain);
+		w.more_popular();
+		find_queen(w);
+		
+	}
+    for(auto a:m_list ){
+		if (a.is_avail()&&a.get()) {
+			FemalePlayer w = a.dream_girl();
+			w.meet(a);
+			w.more_popular();
+			find_queen(w);
+		}
+		
     }
     //cout<<queen->show_id()<<endl;
 }
 
 void Match::reset_women_pool(){
-	boost::shared_ptr<Man> dummy=make_shared<Man>(Man());
+	MalePlayer dummy=MalePlayer(Man());
     //int w_size =women_pool.size();
-    for(auto a:women_pool){
+    for(auto a:w_list){
        // cout<<(a.second)->show_id()<<endl;
-        (a.second)->reset(dummy);
+        a->reset(dummy);
     }
-    queen=make_shared<woman>(woman());
+	if (FemaleMain.is_loaded())
+		FemaleMain->reset(dummy);
+    queen=FemalePlayer(woman());
 }
 
 bool Match::matching_n_reset(){
-	boost::shared_ptr<Man> the_one=queen->loved_one;
+	MalePlayer the_one=queen->she_loves();
     if(queen->show_id()==-1){
         cout<<"Congratulation: you just found your man. Male:"<<the_one->show_id()<<endl;
-        queen->availability=false;
-        women_pool.erase(-1);
+        queen->chosen();
+        //women_pool.erase(-1);
+		FemaleMain.free();
         return false;
     }
     if(the_one->show_id()==-1){
         cout<<"Congratulation: you just found your woman. Female:"<<queen->show_id()<<endl;
-        men_pool.erase(-1);
+        //men_pool.erase(-1);
+		MaleMain.free();
         return false;
     }
     // this is to remove the couple from futher matching
-    queen->availability=false;
-    //the_one->availability=false;
+    queen->chosen();
+    the_one->chosen();
     //cout<<the_one->show_id()<<" "<<queen->show_id()<<" : "<<queen->check_popularity()<<endl;
 
-    missing_male_bin.push(the_one);
-    men_pool.erase(the_one->show_id());
+    missing_male_bin.push(the_one->show_id());
+    //men_pool.erase(the_one->show_id());
 
-    if(men_pool.find(the_one->show_id())!=men_pool.end())
-        cout<<"erase failed."<<endl;
+    //if(m_list[the_one->show_id()])
+     //   cout<<"erase failed."<<endl;
 
     reset_women_pool();
     return true;
@@ -112,43 +161,50 @@ bool Match::matching_n_reset(){
     if(is){
     // the basic idea is to remove a random player in the pool, store it in the missing ptr and add the player in the -1 position
         if(the_sex){
-            int id=rand()%100;
+            //int id=rand()%100;
             //For debug, id=15 or don't erase the random player.
-            //int id=15;
-            missing_male_bin.push(men_pool[id]);
-            men_pool.erase(id);
-			boost::shared_ptr<Man> b= boost::make_shared<Man>(Man(-1,stoi(appearence),stoi(personality),stoi(wealth),
-                                                   stoi(expect_appearence),stoi(expect_personality),stoi(expect_wealth)));
-            men_pool[-1]=b;
+            int id=15;
+            //missing_male_bin.push(men_pool[id]);
+            //men_pool.erase(id);
+			m_list[id].chosen();
+			//boost::shared_ptr<Man> b= boost::make_shared<Man>(Man(-1,stoi(appearence),stoi(personality),stoi(wealth),
+             //                                      stoi(expect_appearence),stoi(expect_personality),stoi(expect_wealth)));
+			auto b = MalePlayer(-1, stoi(appearence), stoi(personality), stoi(wealth),
+				stoi(expect_appearence), stoi(expect_personality), stoi(expect_wealth));
+            //men_pool[-1]=b;
+			MaleMain = b;
 
-            b->meet_women(women_pool);
-            if(b->dream_girls.size()==100)
+            MaleMain.meet_women(w_list);
+            if(MaleMain->q_size()==100)
                 cout<< "Player "<<" met all the girls."<<endl;
-            if(b->expect_appearence+b->expect_personality+b->expect_wealth==100)
+            if(MaleMain.expect_check())
                 cout<<"Player "<<" created. "<<endl;
             else
                 cout<<"Player's data is corrupted"<<endl;
 
         }
         else{
-            int id=rand()%100;
+            //int id=rand()%100;
             //for debug id=99
-            //int id=99;
-            women_pool[id]->availability=false;
-			boost::shared_ptr<woman> b= boost::make_shared<woman>(woman(-1,stoi(appearence),stoi(personality),stoi(wealth),
-                                                   stoi(expect_appearence),stoi(expect_personality),stoi(expect_wealth)));
-            women_pool[-1]=b;
+            int id=99;
+            w_list[id]->chosen();
+			//boost::shared_ptr<woman> b= boost::make_shared<woman>(woman(-1,stoi(appearence),stoi(personality),stoi(wealth),
+            //                                       stoi(expect_appearence),stoi(expect_personality),stoi(expect_wealth)));
+			auto b = FemalePlayer(-1, stoi(appearence), stoi(personality), stoi(wealth),
+				stoi(expect_appearence), stoi(expect_personality), stoi(expect_wealth));
+			FemaleMain=b;
 
-            b->loved_one= boost::make_shared<Man>(Man());
+            //b->loved_one= boost::make_shared<Man>(Man());
+			FemaleMain ->fell_love( MalePlayer(Man()));
             //cout<<women_pool[id]->show_id()<<endl;
 
             //updata men's dream girl list
-            for(auto &a: men_pool)
-                (a.second)->new_girl(b);
+            for(auto &a: m_list)
+                a->new_girl(FemaleMain);
             //if(men_pool[0]->dream_girls.size()==101)
             cout<<"Player is introduced. "<<endl;
 
-            if(b->expect_appearence+b->expect_personality+b->expect_wealth==100)
+            if(FemaleMain.expect_check())
                 cout<<"Player created. "<<endl;
             else
                 cout<<"Player's data is corrupted"<<endl;
@@ -160,25 +216,31 @@ bool Match::matching_n_reset(){
 }
 
 void Match::restore(){
-    for(auto &a:women_pool){
-        if((a.second)->show_id()!=-1)
-            (a.second)->availability=true;
+    for(auto &a:w_list){
+        if(a->show_id()!=-1)
+            a->ready();
         //women_pool[i]->reset(make_shared<Man>(Man()));
     }
-    while(!missing_male_bin.empty()){
-        auto a=missing_male_bin.top();
-        men_pool[a->show_id()]=a;
-        missing_male_bin.pop();
-    }
-    if(men_pool.size()!=100)
-            cout<<"Restore failed."<<men_pool.size()<<endl;
-    else{
-        for(auto &a:men_pool){
-            (a.second)->restore_dream_girls();
-
-        }
-    }
+	for (auto &a : m_list) {
+		if (a->show_id() != -1)
+			a->ready();
+		a->restore();
+	}
+	
+	while(!missing_male_bin.empty()){
+		//auto a=missing_male_bin.top();
+		m_list[missing_male_bin.top()]->ready();
+		missing_male_bin.pop();
+	}
+	if (missing_male_bin.size())
+		cout << "Restore failed." << m_list.size() << endl;
+	else{
+		for(auto &a:m_list){
+			a->restore();
+		}
+	}	
     reset_women_pool();
+	
     cout<<"*****************************"<<endl;
 
 }
