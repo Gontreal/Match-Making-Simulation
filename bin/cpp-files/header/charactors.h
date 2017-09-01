@@ -146,8 +146,7 @@ public:
     woman()=default;
 	~woman(){}
 
-
-	int check_popularity() const {return popularity;}
+		int check_popularity() const {return popularity;}
 	//evaluation of the male player who invite this girl according to the spec.
 	void meet(const MalePlayer& a) {eval(a);}
 	//reset after each round
