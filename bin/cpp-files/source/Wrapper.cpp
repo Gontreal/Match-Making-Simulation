@@ -76,9 +76,9 @@ BOOST_PYTHON_MODULE(charactors)
         .def("expect_check",&FemalePlayer::expect_check)
         .def("check_popularity",&FemalePlayer::check_popularity)
         .def("meet",&FemalePlayer::meet)
-        .def("reset",&FemalePlayer::reset)
         .def("she_loves",&FemalePlayer::she_loves)
         .def("more_popular",&FemalePlayer::more_popular)
+        .def("reset",&FemalePlayer::reset)
         .def("fell_love",&FemalePlayer::fell_love)
 
     ;

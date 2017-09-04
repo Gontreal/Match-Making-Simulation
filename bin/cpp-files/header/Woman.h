@@ -18,9 +18,7 @@ friend class FemalePlayer;
 //friend class Match;
 
 public:
-	Woman(int id,int appearence,int personality,int wealth,int e_appear,int e_personality,int e_wealth)
-        :Person(id,appearence,personality,wealth,e_appear,e_personality,e_wealth),popularity(0)
-    {}
+	Woman(int id,int appearence,int personality,int wealth,int e_appear,int e_personality,int e_wealth);
     Woman()=default;
 	~Woman(){}
 
@@ -28,7 +26,7 @@ public:
 	//evaluation of the male player who invite this girl according to the spec.
 	void meet(const MalePlayer& a) {eval(a);}
 	//reset after each round
-	void reset( const MalePlayer& dummy)  {popularity=0;loved_one=dummy;}
+	void reset();
 	MalePlayer she_loves() { return loved_one; }
 	void more_popular() { ++popularity; }
 	void fell_love(const MalePlayer& m) { loved_one = m; }

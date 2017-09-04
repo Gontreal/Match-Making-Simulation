@@ -46,7 +46,7 @@ public:
 	//evaluation of the male player who invite this girl according to the spec.
 	void meet(const MalePlayer& a);
 	//reset after each round
-	void reset(const MalePlayer& dummy);
+	void reset();
 	MalePlayer she_loves();
 	void more_popular();
 	void fell_love(const MalePlayer& m);

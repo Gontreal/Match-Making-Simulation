@@ -120,11 +120,11 @@ void FemalePlayer::meet(const MalePlayer& a)
 		throw runtime_error("Object not loaded.");
 }
 //reset after each round
-void FemalePlayer::reset(const MalePlayer& dummy)
+void FemalePlayer::reset()
 {
 	if (woman_ptr) {
 		woman_ptr->popularity = 0;
-		woman_ptr->loved_one = dummy;
+		woman_ptr->loved_one = MalePlayer(Man());
 	}
 	else
 		throw runtime_error("Object not loaded.");
