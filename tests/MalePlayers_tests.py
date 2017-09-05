@@ -21,7 +21,7 @@ def test_dreamgirl():
         m.new_girl(w)
     #TODO: figure out a way to let meet_women() take python list
    #m.meet_women(wlist)
-    assert_equal(m.q_size(),9)
+    assert_equal(m.q_size(),12)
 
     woman=m.dream_girl()
     assert_equal(woman.id(),0)
@@ -35,6 +35,6 @@ def test_dreamgirl():
     assert_equal(woman.id(),7)
     woman.chosen()
     m.restore()
-    assert_equal(m.q_size(),9)
+    assert_equal(m.q_size(),12)
     woman=m.dream_girl()
     assert_equal(woman.id(),1)

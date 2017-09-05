@@ -40,4 +40,4 @@ def test_sheloves():
     #test fell_love()
     w.fell_love(m_list[-1])
     prince=w.she_loves()
-    assert_equal(prince.id(),8)
+    assert_equal(prince.id(),11)
