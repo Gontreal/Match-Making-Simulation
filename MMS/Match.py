@@ -49,7 +49,7 @@ class Match(object):
             w=self.MainM.dream_girl()
             w.meet(self.MainM)
             w.more_popular()
-            self.find_queen(w);
+            self.find_queen(w)
         for k,v in self.men_pool.items():
             if v.is_avail():
                 w=v.dream_girl()
@@ -75,12 +75,12 @@ class Match(object):
         if the_one.id()==-1:
             print("Congratulation: you just found your woman. Female: %d"%self.queen.id())
             self.MainM.free()
-            return False;
+            return False
 
         self.queen.chosen()
         the_one.chosen()
 
-        self.reset_women_pool();
+        self.reset_women_pool()
         return True
 
     def add_player(self,line):
